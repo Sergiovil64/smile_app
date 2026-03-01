@@ -3,6 +3,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:supabase_quickstart/pages/account_page.dart';
 import 'package:supabase_quickstart/pages/login_page.dart';
+import 'dart:developer';
 
 Future<void> main() async {
   await dotenv.load();
@@ -10,7 +11,9 @@ Future<void> main() async {
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
+    debug: true,
   );
+  log('Supabase initialized');
   runApp(const MyApp());
 }
 
