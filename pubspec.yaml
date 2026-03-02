@@ -1,5 +1,5 @@
-name: supabase_quickstart
-description: Sample app on how to get started with Supabase on Flutter.
+name: smile_app
+description: Smile App - Tu espacio a tu ritmo.
 
 publish_to: 'none'
 
@@ -13,7 +13,8 @@ dependencies:
     sdk: flutter
 
   flutter_dotenv: ^5.1.0
-  image_picker: ^1.0.5
+  flutter_riverpod: ^2.5.1
+  google_fonts: ^6.2.1
   supabase_flutter: ^2.0.0
 
 dev_dependencies:
@@ -25,3 +26,4 @@ flutter:
   uses-material-design: true
   assets:
     - .env
+    - lib/assets/
