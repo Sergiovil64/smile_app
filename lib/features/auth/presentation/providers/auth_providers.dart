@@ -1,10 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../data/datasources/auth_remote_datasource.dart';
+import '../../data/datasources/profile_remote_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
+import '../../data/repositories/profile_repository_impl.dart';
 import '../../domain/repositories/auth_repository.dart';
+import '../../domain/repositories/profile_repository.dart';
 import '../../domain/usecases/sign_in_usecase.dart';
-import '../../domain/usecases/sign_up_usecase.dart';
 import '../notifiers/auth_state.dart';
 
 final _supabaseClientProvider = Provider<SupabaseClient>(
@@ -15,16 +17,23 @@ final _authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>(
   (ref) => AuthRemoteDataSourceImpl(ref.watch(_supabaseClientProvider)),
 );
 
+final _profileRemoteDataSourceProvider = Provider<ProfileRemoteDataSource>(
+  (ref) => ProfileRemoteDataSourceImpl(ref.watch(_supabaseClientProvider)),
+);
+
 final _authRepositoryProvider = Provider<AuthRepository>(
   (ref) => AuthRepositoryImpl(ref.watch(_authRemoteDataSourceProvider)),
 );
 
-final _signInUseCaseProvider = Provider<SignInUseCase>(
-  (ref) => SignInUseCase(ref.watch(_authRepositoryProvider)),
+final _profileRepositoryProvider = Provider<ProfileRepository>(
+  (ref) => ProfileRepositoryImpl(ref.watch(_profileRemoteDataSourceProvider)),
 );
 
-final _signUpUseCaseProvider = Provider<SignUpUseCase>(
-  (ref) => SignUpUseCase(ref.watch(_authRepositoryProvider)),
+final _signInUseCaseProvider = Provider<SignInUseCase>(
+  (ref) => SignInUseCase(
+    ref.watch(_authRepositoryProvider),
+    ref.watch(_profileRepositoryProvider),
+  ),
 );
 
 // ── Notifier ─────────────────────────────────────────────────────────────────
@@ -39,27 +48,13 @@ class AuthNotifier extends Notifier<LoginState> {
   }) async {
     state = const LoginLoading();
     try {
-      final user = await ref.read(_signInUseCaseProvider)(
+      final result = await ref.read(_signInUseCaseProvider)(
         email: email,
         password: password,
       );
-      state = LoginSuccess(user);
-    } catch (e) {
-      state = LoginError(_parseError(e));
-    }
-  }
-
-  Future<void> signUp({
-    required String email,
-    required String password,
-  }) async {
-    state = const LoginLoading();
-    try {
-      final user = await ref.read(_signUpUseCaseProvider)(
-        email: email,
-        password: password,
-      );
-      state = LoginSuccess(user);
+      state = result.hasProfile
+          ? LoginSuccess(result.user)
+          : LoginProfileIncomplete(result.user);
     } catch (e) {
       state = LoginError(_parseError(e));
     }

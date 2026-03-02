@@ -8,6 +8,7 @@ import '../../../../shared/widgets/app_text_form_field.dart';
 import '../../../../shared/widgets/app_text_link.dart';
 import '../notifiers/auth_state.dart';
 import '../providers/auth_providers.dart';
+import 'register_profile_page.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -37,12 +38,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         );
   }
 
-  Future<void> _signUp() async {
-    if (!_formKey.currentState!.validate()) return;
-    await ref.read(authNotifierProvider.notifier).signUp(
-          email: _emailController.text.trim(),
-          password: _passwordController.text,
-        );
+  void _goToRegister() {
+    Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const RegisterProfilePage()),
+    );
   }
 
   @override
@@ -59,6 +58,22 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('¡Bienvenido!')),
         );
+      }
+      if (state is LoginProfileIncomplete) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Completa tu perfil para continuar.'),
+          ),
+        );
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => RegisterProfilePage(
+              lockedUserId: state.user.id,
+              lockedEmail: state.user.email,
+            ),
+          ),
+        );
+        ref.read(authNotifierProvider.notifier).reset();
       }
     });
 
@@ -156,7 +171,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     AppButton(
                       label: 'CREAR CUENTA',
                       backgroundColor: AppColors.primaryLight,
-                      onPressed: isLoading ? null : _signUp,
+                      onPressed: isLoading ? null : _goToRegister,
                     ),
 
                     const SizedBox(height: 28),

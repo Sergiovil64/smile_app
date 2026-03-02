@@ -1,9 +1,10 @@
 -- Creación de la tabla de perfil de usuario
 create table user_profile (
-  user_id uuid primary key references users(id) on delete cascade,
+  user_id uuid primary key references auth.users(id) on delete cascade,
   first_name text not null,
   last_name text not null,
   birth_date date not null,
+  gender text not null,
   photo_url text,
   updated_at timestamp with time zone not null default now()
 );
@@ -18,10 +19,7 @@ create policy "Users can view their own profile."
 create policy "Admins can view all profiles."
   on user_profile for select
   using (
-    exists (
-      select 1 from users u
-      where u.id = auth.uid() and u.role = 'ADMIN'
-    )
+    (auth.jwt() -> 'app_metadata' ->> 'role') = 'ADMIN'
   );
 
 create policy "Users can insert their own profile."
@@ -35,10 +33,7 @@ create policy "Users can update their own profile."
 create policy "Admins can update any profile."
   on user_profile for update
   using (
-    exists (
-      select 1 from users u
-      where u.id = auth.uid() and u.role = 'ADMIN'
-    )
+    (auth.jwt() -> 'app_metadata' ->> 'role') = 'ADMIN'
   );
 
 -- Trigger para actualizar el campo updated_at automáticamente

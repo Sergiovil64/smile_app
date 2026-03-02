@@ -1,30 +1,57 @@
--- Datos de prueba: 1 usuario por rol
+-- Datos de prueba: 1 usuario Admin + 1 usuario Adolescent
+-- Contraseña de ambos: Test1234!
 
-insert into users (id, email, password_hash, role, is_active, created_at)
+-- 1. Insertar usuarios en auth.users ─────────────────────────────────────────
+insert into auth.users (
+  id,
+  instance_id,
+  aud,
+  role,
+  email,
+  encrypted_password,
+  email_confirmed_at,
+  raw_app_meta_data,
+  raw_user_meta_data,
+  created_at,
+  updated_at
+)
 values
   (
     '00000000-0000-0000-0000-000000000001',
-    'admin@gmail.com',
-    '$2b$10$placeholderHashForAdminUser000000000000000000000000000',
-    'ADMIN',
-    true,
+    '00000000-0000-0000-0000-000000000000',
+    'authenticated',
+    'authenticated',
+    'admin@smile.test',
+    extensions.crypt('Test1234!', extensions.gen_salt('bf')),
+    now(),
+    '{"provider":"email","providers":["email"],"role":"ADMIN"}'::jsonb,
+    '{}'::jsonb,
+    now(),
     now()
   ),
   (
     '00000000-0000-0000-0000-000000000002',
-    'adolescent@gmail.com',
-    '$2b$10$placeholderHashForAdolescentUser00000000000000000000000',
-    'ADOLESCENT',
-    true,
+    '00000000-0000-0000-0000-000000000000',
+    'authenticated',
+    'authenticated',
+    'juan@smile.test',
+    extensions.crypt('Test1234!', extensions.gen_salt('bf')),
+    now(),
+    '{"provider":"email","providers":["email"],"role":"Adolescent"}'::jsonb,
+    '{}'::jsonb,
+    now(),
     now()
-  );
+  )
+on conflict (id) do nothing;
 
-insert into user_profile (user_id, first_name, last_name, birth_date, photo_url, updated_at)
+-- 2. Insertar perfiles en user_profile ────────────────────────────────────────
+insert into user_profile (user_id, first_name, last_name, gender, birth_date, photo_url, updated_at)
 values
   (
     '00000000-0000-0000-0000-000000000001',
     'Admin',
     'Test',
+    'Masculino',
     '1990-01-15',
     null,
     now()
@@ -33,7 +60,9 @@ values
     '00000000-0000-0000-0000-000000000002',
     'Juan',
     'Pérez',
+    'Masculino',
     '2008-06-20',
     null,
     now()
-  );
+  )
+on conflict (user_id) do nothing;

@@ -10,6 +10,7 @@ class AppTextFormField extends StatelessWidget {
     this.keyboardType = TextInputType.text,
     this.textInputAction = TextInputAction.next,
     this.autocorrect = true,
+    this.readOnly = false,
     this.suffixIcon,
     this.validator,
     this.onFieldSubmitted,
@@ -21,6 +22,7 @@ class AppTextFormField extends StatelessWidget {
   final TextInputType keyboardType;
   final TextInputAction textInputAction;
   final bool autocorrect;
+  final bool readOnly;
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
   final void Function(String)? onFieldSubmitted;
@@ -33,8 +35,11 @@ class AppTextFormField extends StatelessWidget {
       keyboardType: keyboardType,
       textInputAction: textInputAction,
       autocorrect: autocorrect,
+      readOnly: readOnly,
       onFieldSubmitted: onFieldSubmitted,
-      style: const TextStyle(color: AppColors.textPrimary),
+      style: TextStyle(
+        color: readOnly ? AppColors.textSecondary : AppColors.textPrimary,
+      ),
       decoration: InputDecoration(
         labelText: labelText,
         suffixIcon: suffixIcon,
