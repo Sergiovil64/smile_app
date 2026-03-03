@@ -38,10 +38,12 @@ final _signInUseCaseProvider = Provider<SignInUseCase>(
 
 // ── Notifier ─────────────────────────────────────────────────────────────────
 
+// Método que se encarga de notificar el estado de la autenticación
 class AuthNotifier extends Notifier<LoginState> {
   @override
   LoginState build() => const LoginInitial();
 
+  // Método para iniciar sesión
   Future<void> signIn({
     required String email,
     required String password,
@@ -62,6 +64,7 @@ class AuthNotifier extends Notifier<LoginState> {
 
   void reset() => state = const LoginInitial();
 
+  // Método para parsear el error
   String _parseError(Object e) {
     final msg = e.toString();
     if (msg.contains('Invalid login credentials')) {
@@ -77,6 +80,7 @@ class AuthNotifier extends Notifier<LoginState> {
   }
 }
 
+// Provider para el notificador de la autenticación
 final authNotifierProvider = NotifierProvider<AuthNotifier, LoginState>(
   AuthNotifier.new,
 );

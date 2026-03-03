@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
 
+// Widget para el enlace de texto de la aplicación
+// Este widget se encarga de mostrar un enlace de texto con un label, un color y un tamaño de fuente
+
 class AppTextLink extends StatelessWidget {
   const AppTextLink({
     super.key,

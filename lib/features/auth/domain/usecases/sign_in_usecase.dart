@@ -2,6 +2,7 @@ import '../entities/user_entity.dart';
 import '../repositories/auth_repository.dart';
 import '../repositories/profile_repository.dart';
 
+// Usecase para iniciar sesión
 class SignInResult {
   final UserEntity user;
   final bool hasProfile;
@@ -14,6 +15,7 @@ class SignInUseCase {
 
   const SignInUseCase(this._authRepository, this._profileRepository);
 
+  // Método para iniciar sesión
   Future<SignInResult> call({
     required String email,
     required String password,

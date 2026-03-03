@@ -39,10 +39,12 @@ final _registerUserUseCaseProvider = Provider<RegisterUserUseCase>(
 
 // ── Notifier ─────────────────────────────────────────────────────────────────
 
+// Método que se encarga de notificar el estado de registro
 class RegisterNotifier extends Notifier<RegisterState> {
   @override
   RegisterState build() => const RegisterInitial();
 
+  // Método para registrar un nuevo usuario
   Future<void> register({
     required String email,
     required String password,
@@ -72,8 +74,7 @@ class RegisterNotifier extends Notifier<RegisterState> {
     }
   }
 
-  /// Usado cuando el usuario ya existe en Auth pero no tiene perfil.
-  /// Solo crea el perfil, sin llamar a signUp.
+  // Método para completar el registro
   Future<void> completeProfile({
     required String userId,
     required String email,
@@ -102,6 +103,7 @@ class RegisterNotifier extends Notifier<RegisterState> {
 
   void reset() => state = const RegisterInitial();
 
+  // Método para parsear el error
   String _parseError(Object e) {
     if (e is IncompleteRegistrationException) return e.message;
 
@@ -120,6 +122,7 @@ class RegisterNotifier extends Notifier<RegisterState> {
   }
 }
 
+// Provider para el notificador de registro
 final registerNotifierProvider =
     NotifierProvider<RegisterNotifier, RegisterState>(
   RegisterNotifier.new,

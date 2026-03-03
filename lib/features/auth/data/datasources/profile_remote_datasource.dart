@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/user_profile_entity.dart';
 
+// Interfaz para la fuente de datos remota para el perfil de usuario
 abstract class ProfileRemoteDataSource {
   Future<bool> hasProfile(String userId);
 
@@ -16,6 +17,7 @@ abstract class ProfileRemoteDataSource {
   });
 }
 
+// Implementación de la fuente de datos remota para el perfil de usuario
 class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   final SupabaseClient _client;
 
@@ -31,6 +33,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
     return data != null;
   }
 
+  // Método para crear un perfil de usuario
   @override
   Future<UserProfileEntity> createProfile({
     required String userId,
@@ -43,6 +46,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
   }) async {
     String? avatarUrl;
 
+    // Si se proporciona una ruta local para el avatar, se sube al almacenamiento
     if (avatarLocalPath != null) {
       final file = File(avatarLocalPath);
       final ext = avatarLocalPath.split('.').last.toLowerCase();
@@ -60,6 +64,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       avatarUrl = _client.storage.from('avatars').getPublicUrl(filePath);
     }
 
+    // Se crea el perfil de usuario en la base de datos
     await _client.from('user_profile').insert({
       'user_id': userId,
       'first_name': firstName,
@@ -69,6 +74,7 @@ class ProfileRemoteDataSourceImpl implements ProfileRemoteDataSource {
       'photo_url': avatarUrl,
     });
 
+    // Se retorna el perfil de usuario creado
     return UserProfileEntity(
       id: userId,
       email: email,

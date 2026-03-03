@@ -8,6 +8,10 @@ import '../../../../shared/widgets/app_logo.dart';
 import '../notifiers/register_state.dart';
 import '../providers/register_providers.dart';
 
+// Página de registro de foto
+// Este archivo implementa los estilos y la lógica de la página de registro de foto
+// También se encarga de la navegación a la página de inicio
+
 class RegisterPhotoPage extends ConsumerStatefulWidget {
   const RegisterPhotoPage({
     super.key,
@@ -27,14 +31,15 @@ class RegisterPhotoPage extends ConsumerStatefulWidget {
   final String gender;
   final DateTime birthDate;
 
-  /// Si está presente, el usuario ya existe en Auth.
-  /// Se llama completeProfile() en lugar de register().
+  // Si está presente, el usuario ya existe en Auth.
+  // Se llama completeProfile() en lugar de register().
   final String? existingUserId;
 
   @override
   ConsumerState<RegisterPhotoPage> createState() => _RegisterPhotoPageState();
 }
 
+// Estado de la página de registro de foto
 class _RegisterPhotoPageState extends ConsumerState<RegisterPhotoPage> {
   XFile? _selectedImage;
   final _picker = ImagePicker();
@@ -49,6 +54,7 @@ class _RegisterPhotoPageState extends ConsumerState<RegisterPhotoPage> {
     _effectiveUserId = widget.existingUserId;
   }
 
+  // Método para seleccionar la foto de perfil
   Future<void> _pickImage() async {
     final image = await _picker.pickImage(
       source: ImageSource.gallery,
@@ -61,6 +67,7 @@ class _RegisterPhotoPageState extends ConsumerState<RegisterPhotoPage> {
     }
   }
 
+  // Método para completar el registro
   Future<void> _complete() async {
     final notifier = ref.read(registerNotifierProvider.notifier);
 
@@ -87,6 +94,7 @@ class _RegisterPhotoPageState extends ConsumerState<RegisterPhotoPage> {
     }
   }
 
+  // Método para construir la página de registro de foto
   @override
   Widget build(BuildContext context) {
     ref.listen<RegisterState>(registerNotifierProvider, (_, state) {
@@ -106,7 +114,7 @@ class _RegisterPhotoPageState extends ConsumerState<RegisterPhotoPage> {
         ref.read(registerNotifierProvider.notifier).reset();
       }
       if (state is RegisterSuccess) {
-        // TODO: navigate to home
+        // TODO: Implementar pantalla de inicio
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('¡Registro completado!')),
         );
@@ -161,7 +169,7 @@ class _RegisterPhotoPageState extends ConsumerState<RegisterPhotoPage> {
   }
 }
 
-// ── Internal widget ───────────────────────────────────────────────────────────
+// Widget para seleccionar la foto de perfil
 
 class _AvatarPicker extends StatelessWidget {
   const _AvatarPicker({
@@ -201,6 +209,7 @@ class _AvatarPicker extends StatelessWidget {
   }
 }
 
+// Widget para mostrar el placeholder de la foto de perfil
 class _AvatarPlaceholder extends StatelessWidget {
   const _AvatarPlaceholder();
 

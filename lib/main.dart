@@ -5,16 +5,19 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/theme/app_theme.dart';
 import 'features/auth/presentation/pages/login_page.dart';
 
+// Punto de entrada de la aplicación
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
+  // Cargar variables de entorno
   await dotenv.load();
 
+  // Inicializar Supabase
   await Supabase.initialize(
     url: dotenv.env['SUPABASE_URL']!,
     anonKey: dotenv.env['SUPABASE_ANON_KEY']!,
   );
 
+  // Ejecutar la aplicación
   runApp(
     const ProviderScope(
       child: SmileApp(),
@@ -22,9 +25,11 @@ Future<void> main() async {
   );
 }
 
+// Aplicación principal
 class SmileApp extends StatelessWidget {
   const SmileApp({super.key});
 
+  // Construir la aplicación
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

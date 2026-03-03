@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_colors.dart';
 
+// Tema de la aplicación
 abstract class AppTheme {
   static ThemeData get dark {
     return ThemeData.dark().copyWith(

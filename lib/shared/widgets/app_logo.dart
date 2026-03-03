@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+// Widget para la logo de la aplicación
+
 class AppLogo extends StatelessWidget {
   const AppLogo({super.key, this.width = 300});
 

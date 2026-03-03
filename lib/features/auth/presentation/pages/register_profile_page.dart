@@ -6,6 +6,11 @@ import '../../../../shared/widgets/app_logo.dart';
 import '../../../../shared/widgets/app_text_form_field.dart';
 import 'register_photo_page.dart';
 
+// Página de registro de perfil
+// Este archivo implementa los estilos y la lógica de la página de registro de perfil
+// También se encarga de la navegación a la página de registro de foto
+// y la navegación a la página de inicio
+
 class RegisterProfilePage extends StatefulWidget {
   const RegisterProfilePage({
     super.key,
@@ -13,8 +18,6 @@ class RegisterProfilePage extends StatefulWidget {
     this.lockedEmail,
   });
 
-  /// Si se proporcionan, el usuario ya existe en Auth (registro incompleto).
-  /// El email se muestra bloqueado y no se llama a signUp.
   final String? lockedUserId;
   final String? lockedEmail;
 
@@ -24,6 +27,7 @@ class RegisterProfilePage extends StatefulWidget {
   State<RegisterProfilePage> createState() => _RegisterProfilePageState();
 }
 
+// Estado de la página de registro de perfil
 class _RegisterProfilePageState extends State<RegisterProfilePage> {
   final _formKey = GlobalKey<FormState>();
   final _firstNameController = TextEditingController();
@@ -54,6 +58,7 @@ class _RegisterProfilePageState extends State<RegisterProfilePage> {
     super.dispose();
   }
 
+  // Método para seleccionar la fecha de nacimiento
   Future<void> _pickBirthDate() async {
     final now = DateTime.now();
     final picked = await showDatePicker(
@@ -80,6 +85,7 @@ class _RegisterProfilePageState extends State<RegisterProfilePage> {
     }
   }
 
+  // Método para continuar con el registro
   void _continue() {
     if (!_formKey.currentState!.validate()) return;
     if (_birthDate == null) {
@@ -104,6 +110,7 @@ class _RegisterProfilePageState extends State<RegisterProfilePage> {
     );
   }
 
+  // Método para formatear la fecha de nacimiento
   String _formatDate(DateTime date) {
     final day = date.day.toString().padLeft(2, '0');
     final month = date.month.toString().padLeft(2, '0');
@@ -111,6 +118,7 @@ class _RegisterProfilePageState extends State<RegisterProfilePage> {
     return '$day/$month/$year';
   }
 
+  // Método para construir la página de registro de perfil
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -273,8 +281,7 @@ class _RegisterProfilePageState extends State<RegisterProfilePage> {
   }
 }
 
-// ── Internal widgets ──────────────────────────────────────────────────────────
-
+// Widget para seleccionar el género
 class _GenderDropdown extends StatelessWidget {
   const _GenderDropdown({
     required this.value,
@@ -310,6 +317,7 @@ class _GenderDropdown extends StatelessWidget {
   }
 }
 
+// Widget para seleccionar la fecha de nacimiento
 class _BirthDateField extends StatelessWidget {
   const _BirthDateField({
     required this.date,

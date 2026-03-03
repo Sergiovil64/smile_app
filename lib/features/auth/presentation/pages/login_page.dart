@@ -10,6 +10,11 @@ import '../notifiers/auth_state.dart';
 import '../providers/auth_providers.dart';
 import 'register_profile_page.dart';
 
+// Página de inicio de sesión
+// Este archivo implementa los estilos y la lógica de la página de inicio de sesión
+// También se encarga de la navegación a la página de registro de perfil
+// y la navegación a la página de inicio
+
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
 
@@ -17,6 +22,7 @@ class LoginPage extends ConsumerStatefulWidget {
   ConsumerState<LoginPage> createState() => _LoginPageState();
 }
 
+// Estado de la página de inicio de sesión
 class _LoginPageState extends ConsumerState<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
@@ -30,6 +36,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
     super.dispose();
   }
 
+  // Método para iniciar sesión
   Future<void> _signIn() async {
     if (!_formKey.currentState!.validate()) return;
     await ref.read(authNotifierProvider.notifier).signIn(
@@ -38,33 +45,39 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         );
   }
 
+  // Método para ir a la página de registro
   void _goToRegister() {
     Navigator.of(context).push(
       MaterialPageRoute(builder: (_) => const RegisterProfilePage()),
     );
   }
 
+  // Método para construir la página de inicio de sesión
   @override
   Widget build(BuildContext context) {
     ref.listen<LoginState>(authNotifierProvider, (_, state) {
+      // Si ocurre un error, se muestra un mensaje de error
       if (state is LoginError) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(state.message)),
         );
         ref.read(authNotifierProvider.notifier).reset();
       }
+      // Si el inicio de sesión es exitoso, se muestra un mensaje de éxito
       if (state is LoginSuccess) {
-        // TODO: navigate to home page
+        // TODO: Implementar pantalla de inicio
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('¡Bienvenido!')),
         );
       }
+      // Si el inicio de sesión es exitoso pero el perfil no está completo, se muestra un mensaje de perfil incompleto
       if (state is LoginProfileIncomplete) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Completa tu perfil para continuar.'),
           ),
         );
+        // Se navega a la página de registro de perfil
         Navigator.of(context).push(
           MaterialPageRoute(
             builder: (_) => RegisterProfilePage(

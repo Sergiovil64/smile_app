@@ -3,6 +3,7 @@ import '../exceptions/auth_exceptions.dart';
 import '../repositories/auth_repository.dart';
 import '../repositories/profile_repository.dart';
 
+// Usecase para registrar un nuevo usuario
 class RegisterUserUseCase {
   final AuthRepository _authRepository;
   final ProfileRepository _profileRepository;
