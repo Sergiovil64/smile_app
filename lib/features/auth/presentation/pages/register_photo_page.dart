@@ -132,7 +132,20 @@ class _RegisterPhotoPageState extends ConsumerState<RegisterPhotoPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              const SizedBox(height: 40),
+              const SizedBox(height: 8),
+
+              Align(
+                alignment: Alignment.centerLeft,
+                child: IconButton(
+                  icon: const Icon(
+                    Icons.arrow_back_ios_new_rounded,
+                    color: AppColors.textPrimary,
+                  ),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              ),
+
+              const SizedBox(height: 8),
 
               const AppLogo(width: 220),
 

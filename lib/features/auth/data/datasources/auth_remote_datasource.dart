@@ -41,7 +41,6 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
       email: email,
       password: password,
     );
-
     final user = response.user;
     if (user == null) throw Exception('Error al crear la cuenta.');
 

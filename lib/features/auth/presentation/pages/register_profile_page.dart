@@ -131,7 +131,20 @@ class _RegisterProfilePageState extends State<RegisterProfilePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const SizedBox(height: 40),
+                const SizedBox(height: 8),
+
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: IconButton(
+                    icon: const Icon(
+                      Icons.arrow_back_ios_new_rounded,
+                      color: AppColors.textPrimary,
+                    ),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
+                ),
+
+                const SizedBox(height: 8),
 
                 const AppLogo(width: 220),
 
@@ -209,9 +222,19 @@ class _RegisterProfilePageState extends State<RegisterProfilePage> {
                       if (v == null || v.isEmpty) {
                         return 'Ingresa tu contraseña.';
                       }
-                      if (v.length < 6) return 'Mínimo 6 caracteres.';
+                      if (!_PasswordCriteria.allMet(v)) {
+                        return 'La contraseña no cumple los requisitos.';
+                      }
                       return null;
                     },
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: _passwordController,
+                    builder: (_, value, __) =>
+                        _PasswordStrengthIndicator(password: value.text),
                   ),
 
                   const SizedBox(height: 14),
@@ -247,8 +270,6 @@ class _RegisterProfilePageState extends State<RegisterProfilePage> {
 
                   const SizedBox(height: 14),
                 ],
-
-                const SizedBox(height: 14),
 
                 _GenderDropdown(
                   value: _selectedGender,
@@ -313,6 +334,145 @@ class _GenderDropdown extends StatelessWidget {
             ),
           )
           .toList(),
+    );
+  }
+}
+
+// Criterios de contraseña requeridos por el backend
+abstract class _PasswordCriteria {
+  static bool hasLength(String v) => v.length >= 12;
+  static bool hasLowercase(String v) => v.contains(RegExp(r'[a-z]'));
+  static bool hasUppercase(String v) => v.contains(RegExp(r'[A-Z]'));
+  static bool hasDigit(String v) => v.contains(RegExp(r'[0-9]'));
+  static bool hasSpecial(String v) =>
+      v.contains(RegExp(r'''[!@#$%^&*()\-_=+\[\]{};':"\\|,.<>?/`~]'''));
+
+  static bool allMet(String v) =>
+      hasLength(v) &&
+      hasLowercase(v) &&
+      hasUppercase(v) &&
+      hasDigit(v) &&
+      hasSpecial(v);
+}
+
+// Indicador visual de fortaleza de contraseña
+class _PasswordStrengthIndicator extends StatelessWidget {
+  const _PasswordStrengthIndicator({required this.password});
+
+  final String password;
+
+  @override
+  Widget build(BuildContext context) {
+    final metCount = [
+      _PasswordCriteria.hasLength(password),
+      _PasswordCriteria.hasLowercase(password),
+      _PasswordCriteria.hasUppercase(password),
+      _PasswordCriteria.hasDigit(password),
+      _PasswordCriteria.hasSpecial(password),
+    ].where((c) => c).length;
+
+    final Color barColor = switch (metCount) {
+      0 || 1 => AppColors.error,
+      2 || 3 => const Color(0xFFFF9F0A),
+      4 => AppColors.primary,
+      _ => const Color(0xFF30D158),
+    };
+
+    final String strengthLabel = switch (metCount) {
+      0 || 1 => 'Muy débil',
+      2 || 3 => 'Débil',
+      4 => 'Casi lista',
+      _ => 'Segura',
+    };
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: BorderRadius.circular(10),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(4),
+                  child: LinearProgressIndicator(
+                    value: metCount / 5,
+                    minHeight: 4,
+                    backgroundColor: AppColors.inputBorder,
+                    valueColor: AlwaysStoppedAnimation<Color>(barColor),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              Text(
+                strengthLabel,
+                style: GoogleFonts.inter(
+                  color: barColor,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          _CriteriaRow(
+            met: _PasswordCriteria.hasLength(password),
+            label: 'Mínimo 12 caracteres',
+          ),
+          _CriteriaRow(
+            met: _PasswordCriteria.hasUppercase(password),
+            label: 'Una letra mayúscula (A-Z)',
+          ),
+          _CriteriaRow(
+            met: _PasswordCriteria.hasLowercase(password),
+            label: 'Una letra minúscula (a-z)',
+          ),
+          _CriteriaRow(
+            met: _PasswordCriteria.hasDigit(password),
+            label: 'Un número (0-9)',
+          ),
+          _CriteriaRow(
+            met: _PasswordCriteria.hasSpecial(password),
+            label: 'Un carácter especial (!@#\$...)',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _CriteriaRow extends StatelessWidget {
+  const _CriteriaRow({required this.met, required this.label});
+
+  final bool met;
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = met ? const Color(0xFF30D158) : AppColors.textSecondary;
+    return Padding(
+      padding: const EdgeInsets.only(top: 4),
+      child: Row(
+        children: [
+          Icon(
+            met ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
+            size: 14,
+            color: color,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              color: color,
+              fontSize: 12,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
