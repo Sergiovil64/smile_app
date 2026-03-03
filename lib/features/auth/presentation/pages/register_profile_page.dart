@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../shared/widgets/app_button.dart';
@@ -58,33 +59,6 @@ class _RegisterProfilePageState extends State<RegisterProfilePage> {
     super.dispose();
   }
 
-  // Método para seleccionar la fecha de nacimiento
-  Future<void> _pickBirthDate() async {
-    final now = DateTime.now();
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _birthDate ?? DateTime(now.year - 18, now.month, now.day),
-      firstDate: DateTime(1920),
-      lastDate: DateTime(now.year - 5, now.month, now.day),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.dark(
-              primary: AppColors.primary,
-              onPrimary: AppColors.onPrimary,
-              surface: AppColors.surface,
-              onSurface: AppColors.textPrimary,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null) {
-      setState(() => _birthDate = picked);
-    }
-  }
-
   // Método para continuar con el registro
   void _continue() {
     if (!_formKey.currentState!.validate()) return;
@@ -108,14 +82,6 @@ class _RegisterProfilePageState extends State<RegisterProfilePage> {
         ),
       ),
     );
-  }
-
-  // Método para formatear la fecha de nacimiento
-  String _formatDate(DateTime date) {
-    final day = date.day.toString().padLeft(2, '0');
-    final month = date.month.toString().padLeft(2, '0');
-    final year = date.year;
-    return '$day/$month/$year';
   }
 
   // Método para construir la página de registro de perfil
@@ -281,8 +247,7 @@ class _RegisterProfilePageState extends State<RegisterProfilePage> {
 
                 _BirthDateField(
                   date: _birthDate,
-                  onTap: _pickBirthDate,
-                  formatDate: _formatDate,
+                  onDateChanged: (d) => setState(() => _birthDate = d),
                 ),
 
                 const SizedBox(height: 32),
@@ -477,48 +442,152 @@ class _CriteriaRow extends StatelessWidget {
   }
 }
 
-// Widget para seleccionar la fecha de nacimiento
-class _BirthDateField extends StatelessWidget {
+// Formatea la entrada numérica automáticamente como DD/MM/AAAA.
+class _DateInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    final digits = newValue.text.replaceAll(RegExp(r'[^0-9]'), '');
+    if (digits.isEmpty) return const TextEditingValue();
+
+    final buf = StringBuffer();
+    for (int i = 0; i < digits.length && i < 8; i++) {
+      if (i == 2 || i == 4) buf.write('/');
+      buf.write(digits[i]);
+    }
+    final formatted = buf.toString();
+    return TextEditingValue(
+      text: formatted,
+      selection: TextSelection.collapsed(offset: formatted.length),
+    );
+  }
+}
+
+// Widget para ingresar la fecha de nacimiento (texto libre + calendario).
+class _BirthDateField extends StatefulWidget {
   const _BirthDateField({
     required this.date,
-    required this.onTap,
-    required this.formatDate,
+    required this.onDateChanged,
   });
 
   final DateTime? date;
-  final VoidCallback onTap;
-  final String Function(DateTime) formatDate;
+  final ValueChanged<DateTime?> onDateChanged;
+
+  @override
+  State<_BirthDateField> createState() => _BirthDateFieldState();
+}
+
+class _BirthDateFieldState extends State<_BirthDateField> {
+  late final TextEditingController _controller;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = TextEditingController(
+      text: widget.date != null ? _fmt(widget.date!) : '',
+    );
+  }
+
+  @override
+  void didUpdateWidget(_BirthDateField old) {
+    super.didUpdateWidget(old);
+    if (widget.date != old.date && widget.date != null) {
+      final text = _fmt(widget.date!);
+      if (_controller.text != text) _controller.text = text;
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  String _fmt(DateTime d) =>
+      '${d.day.toString().padLeft(2, '0')}/'
+      '${d.month.toString().padLeft(2, '0')}/'
+      '${d.year}';
+
+  DateTime? _parse(String text) {
+    if (text.length != 10) return null;
+    try {
+      final p = text.split('/');
+      if (p.length != 3) return null;
+      final day = int.parse(p[0]);
+      final month = int.parse(p[1]);
+      final year = int.parse(p[2]);
+      final date = DateTime(year, month, day);
+      if (date.day != day || date.month != month || date.year != year) {
+        return null;
+      }
+      return date;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  Future<void> _openPicker() async {
+    final now = DateTime.now();
+    final current = _parse(_controller.text);
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: current ?? widget.date ?? DateTime(now.year - 18, now.month, now.day),
+      firstDate: DateTime(1920),
+      lastDate: DateTime(now.year - 5, now.month, now.day),
+      builder: (context, child) => Theme(
+        data: Theme.of(context).copyWith(
+          colorScheme: const ColorScheme.dark(
+            primary: AppColors.primary,
+            onPrimary: AppColors.onPrimary,
+            surface: AppColors.surface,
+            onSurface: AppColors.textPrimary,
+          ),
+        ),
+        child: child!,
+      ),
+    );
+    if (picked != null) {
+      _controller.text = _fmt(picked);
+      widget.onDateChanged(picked);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: AbsorbPointer(
-        child: TextFormField(
-          readOnly: true,
-          controller: TextEditingController(
-            text: date != null ? formatDate(date!) : '',
+    return TextFormField(
+      controller: _controller,
+      keyboardType: TextInputType.number,
+      inputFormatters: [_DateInputFormatter()],
+      style: GoogleFonts.inter(color: AppColors.textPrimary, fontSize: 16),
+      decoration: InputDecoration(
+        labelText: 'Fecha de Nacimiento',
+        hintText: 'DD/MM/AAAA',
+        hintStyle: GoogleFonts.inter(color: AppColors.textSecondary),
+        suffixIcon: IconButton(
+          icon: const Icon(
+            Icons.calendar_today_outlined,
+            color: AppColors.textSecondary,
+            size: 20,
           ),
-          style: GoogleFonts.inter(
-            color: AppColors.textPrimary,
-            fontSize: 16,
-          ),
-          decoration: InputDecoration(
-            labelText: 'Fecha de Nacimiento',
-            suffixIcon: const Icon(
-              Icons.calendar_today_outlined,
-              color: AppColors.textSecondary,
-              size: 20,
-            ),
-            hintText: 'DD/MM/AAAA',
-            hintStyle: GoogleFonts.inter(
-              color: AppColors.textSecondary,
-            ),
-          ),
-          validator: (_) =>
-              date == null ? 'Selecciona tu fecha de nacimiento.' : null,
+          onPressed: _openPicker,
         ),
       ),
+      onChanged: (value) => widget.onDateChanged(_parse(value)),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return 'Ingresa tu fecha de nacimiento.';
+        }
+        final date = _parse(value);
+        if (date == null) return 'Fecha no válida. Usa DD/MM/AAAA.';
+        final now = DateTime.now();
+        if (date.isBefore(DateTime(1920))) return 'Fecha no válida.';
+        if (date.isAfter(DateTime(now.year - 10, now.month, now.day))) {
+          return 'Debes tener al menos 10 años.';
+        }
+        return null;
+      },
     );
   }
 }

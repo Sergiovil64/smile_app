@@ -113,12 +113,7 @@ class _RegisterPhotoPageState extends ConsumerState<RegisterPhotoPage> {
         );
         ref.read(registerNotifierProvider.notifier).reset();
       }
-      if (state is RegisterSuccess) {
-        // TODO: Implementar pantalla de inicio
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('¡Registro completado!')),
-        );
-      }
+      // RegisterSuccess: ref.listen en AuthGate detecta el cambio de sesión y hace pop al root.
     });
 
     final registerState = ref.watch(registerNotifierProvider);

@@ -63,13 +63,7 @@ class _LoginPageState extends ConsumerState<LoginPage> {
         );
         ref.read(authNotifierProvider.notifier).reset();
       }
-      // Si el inicio de sesión es exitoso, se muestra un mensaje de éxito
-      if (state is LoginSuccess) {
-        // TODO: Implementar pantalla de inicio
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('¡Bienvenido!')),
-        );
-      }
+      // LoginSuccess: ref.listen en AuthGate detecta el cambio de sesión y hace pop al root.
       // Si el inicio de sesión es exitoso pero el perfil no está completo, se muestra un mensaje de perfil incompleto
       if (state is LoginProfileIncomplete) {
         ScaffoldMessenger.of(context).showSnackBar(

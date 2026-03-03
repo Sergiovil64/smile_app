@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/theme/app_theme.dart';
-import 'features/auth/presentation/pages/login_page.dart';
+import 'core/widgets/auth_gate.dart';
 
 // Punto de entrada de la aplicación
 Future<void> main() async {
@@ -36,7 +37,17 @@ class SmileApp extends StatelessWidget {
       title: 'Smile',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.dark,
-      home: const LoginPage(),
+      locale: const Locale('es'),
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('es'),
+        Locale('en'),
+      ],
+      home: const AuthGate(),
     );
   }
 }

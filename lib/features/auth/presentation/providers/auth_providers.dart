@@ -84,3 +84,9 @@ class AuthNotifier extends Notifier<LoginState> {
 final authNotifierProvider = NotifierProvider<AuthNotifier, LoginState>(
   AuthNotifier.new,
 );
+
+// Stream que emite el estado de sesión de Supabase en tiempo real.
+// El primer evento llega casi inmediatamente con la sesión persistida (o null).
+final supabaseSessionProvider = StreamProvider<AuthState>(
+  (_) => Supabase.instance.client.auth.onAuthStateChange,
+);
