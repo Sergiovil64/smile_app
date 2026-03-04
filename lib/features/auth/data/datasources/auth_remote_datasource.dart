@@ -6,6 +6,7 @@ abstract class AuthRemoteDataSource {
   Future<UserEntity> signIn({required String email, required String password});
   Future<UserEntity> signUp({required String email, required String password});
   Future<void> signOut();
+  Future<void> resetPassword({required String email});
 }
 
 // Implementación de la fuente de datos remota para la autenticación
@@ -51,5 +52,11 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   @override
   Future<void> signOut() async {
     await _client.auth.signOut();
+  }
+
+  // Método para enviar correo de restablecimiento de contraseña
+  @override
+  Future<void> resetPassword({required String email}) async {
+    await _client.auth.resetPasswordForEmail(email);
   }
 }

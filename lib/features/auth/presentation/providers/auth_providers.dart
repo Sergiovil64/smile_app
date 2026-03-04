@@ -8,6 +8,7 @@ import '../../domain/repositories/auth_repository.dart';
 import '../../domain/repositories/profile_repository.dart';
 import '../../domain/usecases/sign_in_usecase.dart';
 import '../notifiers/auth_state.dart';
+import '../notifiers/forgot_password_state.dart';
 
 final _supabaseClientProvider = Provider<SupabaseClient>(
   (_) => Supabase.instance.client,
@@ -89,4 +90,38 @@ final authNotifierProvider = NotifierProvider<AuthNotifier, LoginState>(
 // El primer evento llega casi inmediatamente con la sesión persistida (o null).
 final supabaseSessionProvider = StreamProvider<AuthState>(
   (_) => Supabase.instance.client.auth.onAuthStateChange,
+);
+
+
+class ForgotPasswordNotifier extends Notifier<ForgotPasswordState> {
+  @override
+  ForgotPasswordState build() => const ForgotPasswordInitial();
+
+  Future<void> sendResetEmail({required String email}) async {
+    state = const ForgotPasswordLoading();
+    try {
+      await ref.read(_authRepositoryProvider).resetPassword(email: email);
+      state = ForgotPasswordSuccess(email);
+    } catch (e) {
+      state = ForgotPasswordError(_parseError(e));
+    }
+  }
+
+  void reset() => state = const ForgotPasswordInitial();
+
+  String _parseError(Object e) {
+    final msg = e.toString();
+    if (msg.contains('network') || msg.contains('SocketException')) {
+      return 'Sin conexión a Internet.';
+    }
+    if (msg.contains('rate limit') || msg.contains('429')) {
+      return 'Demasiados intentos. Espera un momento.';
+    }
+    return 'Ocurrió un error. Intenta de nuevo.';
+  }
+}
+
+final forgotPasswordNotifierProvider =
+    NotifierProvider<ForgotPasswordNotifier, ForgotPasswordState>(
+  ForgotPasswordNotifier.new,
 );

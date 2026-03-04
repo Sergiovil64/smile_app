@@ -33,4 +33,10 @@ class AuthRepositoryImpl implements AuthRepository {
   Future<void> signOut() {
     return _dataSource.signOut();
   }
+
+  // Método para enviar correo de restablecimiento de contraseña
+  @override
+  Future<void> resetPassword({required String email}) {
+    return _dataSource.resetPassword(email: email);
+  }
 }

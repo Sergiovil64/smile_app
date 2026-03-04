@@ -8,6 +8,7 @@ import '../../../../shared/widgets/app_text_form_field.dart';
 import '../../../../shared/widgets/app_text_link.dart';
 import '../notifiers/auth_state.dart';
 import '../providers/auth_providers.dart';
+import 'forgot_password_page.dart';
 import 'register_profile_page.dart';
 
 // Página de inicio de sesión
@@ -186,7 +187,11 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     AppTextLink(
                       label: '¿Problemas para entrar?',
                       onPressed: () {
-                        // TODO: navigate to forgot password
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const ForgotPasswordPage(),
+                          ),
+                        );
                       },
                     ),
 
