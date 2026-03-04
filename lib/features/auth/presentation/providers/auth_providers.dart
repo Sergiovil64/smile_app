@@ -9,6 +9,7 @@ import '../../domain/repositories/profile_repository.dart';
 import '../../domain/usecases/sign_in_usecase.dart';
 import '../notifiers/auth_state.dart';
 import '../notifiers/forgot_password_state.dart';
+import '../notifiers/reset_password_state.dart';
 
 final _supabaseClientProvider = Provider<SupabaseClient>(
   (_) => Supabase.instance.client,
@@ -124,4 +125,37 @@ class ForgotPasswordNotifier extends Notifier<ForgotPasswordState> {
 final forgotPasswordNotifierProvider =
     NotifierProvider<ForgotPasswordNotifier, ForgotPasswordState>(
   ForgotPasswordNotifier.new,
+);
+
+class ResetPasswordNotifier extends Notifier<ResetPasswordState> {
+  @override
+  ResetPasswordState build() => const ResetPasswordInitial();
+
+  Future<void> updatePassword({required String password}) async {
+    state = const ResetPasswordLoading();
+    try {
+      await ref.read(_authRepositoryProvider).updatePassword(password: password);
+      state = const ResetPasswordSuccess();
+    } catch (e) {
+      state = ResetPasswordError(_parseError(e));
+    }
+  }
+
+  void reset() => state = const ResetPasswordInitial();
+
+  String _parseError(Object e) {
+    final msg = e.toString();
+    if (msg.contains('network') || msg.contains('SocketException')) {
+      return 'Sin conexión a Internet.';
+    }
+    if (msg.contains('same password')) {
+      return 'La nueva contraseña debe ser diferente a la actual.';
+    }
+    return 'Ocurrió un error. Intenta de nuevo.';
+  }
+}
+
+final resetPasswordNotifierProvider =
+    NotifierProvider<ResetPasswordNotifier, ResetPasswordState>(
+  ResetPasswordNotifier.new,
 );

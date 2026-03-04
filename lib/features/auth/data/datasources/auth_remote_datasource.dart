@@ -7,6 +7,7 @@ abstract class AuthRemoteDataSource {
   Future<UserEntity> signUp({required String email, required String password});
   Future<void> signOut();
   Future<void> resetPassword({required String email});
+  Future<void> updatePassword({required String password});
 }
 
 // Implementación de la fuente de datos remota para la autenticación
@@ -57,6 +58,15 @@ class AuthRemoteDataSourceImpl implements AuthRemoteDataSource {
   // Método para enviar correo de restablecimiento de contraseña
   @override
   Future<void> resetPassword({required String email}) async {
-    await _client.auth.resetPasswordForEmail(email);
+    await _client.auth.resetPasswordForEmail(
+      email,
+      redirectTo: 'com.smile.app://reset-callback',
+    );
+  }
+
+  // Método para actualizar la contraseña del usuario autenticado
+  @override
+  Future<void> updatePassword({required String password}) async {
+    await _client.auth.updateUser(UserAttributes(password: password));
   }
 }

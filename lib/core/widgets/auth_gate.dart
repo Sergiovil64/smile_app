@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart' show AuthChangeEvent;
 import '../../features/auth/presentation/pages/login_page.dart';
+import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
 import '../../features/home/presentation/pages/home_screen.dart';
 import '../constants/app_colors.dart';
@@ -14,9 +16,21 @@ class AuthGate extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.listen(supabaseSessionProvider, (_, next) {
-      next.whenData((_) {
+      next.whenData((authState) {
         final navigator = Navigator.of(context);
-        if (navigator.canPop()) {
+
+        if (authState.event == AuthChangeEvent.passwordRecovery) {
+          // El usuario abrió el deep link de recuperación de contraseña.
+          // Se navega a la pantalla de cambio de contraseña.
+          navigator.push(
+            MaterialPageRoute(builder: (_) => const ResetPasswordPage()),
+          );
+          return;
+        }
+
+        // Para cualquier otro evento con sesión activa (signedIn, userUpdated, etc.)
+        // se limpia el stack y AuthGate muestra HomeScreen.
+        if (authState.session != null && navigator.canPop()) {
           navigator.popUntil((route) => route.isFirst);
         }
       });
@@ -26,7 +40,10 @@ class AuthGate extends ConsumerWidget {
 
     return sessionAsync.when(
       data: (authState) {
-        if (authState.session != null) return const HomeScreen();
+        if (authState.session != null &&
+            authState.event != AuthChangeEvent.passwordRecovery) {
+          return const HomeScreen();
+        }
         return const LoginPage();
       },
       loading: () => const _SplashScreen(),
