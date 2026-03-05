@@ -1,10 +1,13 @@
+import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart' show AuthChangeEvent;
 import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/auth/presentation/pages/reset_password_page.dart';
 import '../../features/auth/presentation/providers/auth_providers.dart';
+import '../../features/home/presentation/pages/admin_home_screen.dart';
 import '../../features/home/presentation/pages/home_screen.dart';
+import '../../features/home/presentation/providers/home_providers.dart';
 import '../constants/app_colors.dart';
 
 /// Decide qué pantalla mostrar según si existe sesión activa en Supabase.
@@ -42,12 +45,33 @@ class AuthGate extends ConsumerWidget {
       data: (authState) {
         if (authState.session != null &&
             authState.event != AuthChangeEvent.passwordRecovery) {
-          return const HomeScreen();
+          return const _RoleGate();
         }
         return const LoginPage();
       },
       loading: () => const _SplashScreen(),
       error: (_, __) => const LoginPage(),
+    );
+  }
+}
+
+class _RoleGate extends ConsumerWidget {
+  const _RoleGate();
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final profileAsync = ref.watch(currentUserProfileProvider);
+
+    return profileAsync.when(
+      data: (profile) {
+        log('profile: ${profile?.role}');
+        if (profile != null && profile.isAdmin) {
+          return const AdminHomeScreen();
+        }
+        return const HomeScreen();
+      },
+      loading: () => const _SplashScreen(),
+      error: (_, __) => const HomeScreen(),
     );
   }
 }

@@ -1,7 +1,14 @@
--- Función para cambiar el rol de un usuario.
--- Solo puede ser invocada por un usuario con rol "ADMIN".
--- Roles válidos: 'Adolescent', 'ADMIN'
+-- Gestión de roles a través de user_profile (schema público).
+-- No se accede a auth.users desde funciones de usuario para evitar
+-- conflictos con GoTrue en el schema de autenticación.
 
+-- Columna de rol en user_profile
+alter table user_profile
+  add column if not exists role text not null default 'Adolescent'
+    check (role in ('Adolescent', 'ADMIN'));
+
+-- Función para que un ADMIN cambie el rol de otro usuario.
+-- Lee y escribe en user_profile, no en auth.users.
 create or replace function public.set_user_role(
   target_user_id uuid,
   new_role       text
@@ -10,30 +17,27 @@ returns void as $$
 declare
   caller_role text;
 begin
-  -- Verificar que el rol solicitado sea válido
   if new_role not in ('Adolescent', 'ADMIN') then
     raise exception 'Rol no válido: %. Los roles permitidos son Adolescent y ADMIN.', new_role;
   end if;
 
-  -- Leer el rol del usuario que llama desde su JWT
-  caller_role := auth.jwt() -> 'app_metadata' ->> 'role';
+  select role into caller_role
+    from user_profile
+   where user_id = auth.uid();
 
-  if caller_role <> 'ADMIN' then
+  if caller_role is distinct from 'ADMIN' then
     raise exception 'Acceso denegado: solo un ADMIN puede cambiar roles.';
   end if;
 
-  -- Aplicar el cambio en auth.users
-  update auth.users
-  set raw_app_meta_data =
-    coalesce(raw_app_meta_data, '{}'::jsonb) || jsonb_build_object('role', new_role)
-  where id = target_user_id;
+  update user_profile
+     set role = new_role
+   where user_id = target_user_id;
 
   if not found then
-    raise exception 'Usuario no encontrado: %', target_user_id;
+    raise exception 'Perfil no encontrado para el usuario: %', target_user_id;
   end if;
 end;
 $$ language plpgsql security definer;
 
--- Revocar acceso público y otorgarlo solo a usuarios autenticados
 revoke execute on function public.set_user_role(uuid, text) from public, anon;
 grant  execute on function public.set_user_role(uuid, text) to authenticated;

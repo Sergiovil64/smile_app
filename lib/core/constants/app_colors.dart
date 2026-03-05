@@ -12,4 +12,5 @@ abstract class AppColors {
   static const Color textHint = Color(0xFF3A3A3C);
   static const Color inputBorder = Color(0xFF2C2C2E);
   static const Color error = Color(0xFFFF453A);
+  static const Color appBarBackground = Colors.white10;
 }

@@ -21,7 +21,14 @@ class SignInUseCase {
     required String password,
   }) async {
     final user = await _authRepository.signIn(email: email, password: password);
-    final profileExists = await _profileRepository.hasProfile(user.id);
-    return SignInResult(user: user, hasProfile: profileExists);
+
+    // Si la verificación falla por un error transitorio en la BD, se asume
+    // hasProfile: true y _RoleGate determina el rol de forma asíncrona.
+    try {
+      final profileExists = await _profileRepository.hasProfile(user.id);
+      return SignInResult(user: user, hasProfile: profileExists);
+    } catch (_) {
+      return SignInResult(user: user, hasProfile: true);
+    }
   }
 }

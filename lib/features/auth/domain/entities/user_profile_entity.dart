@@ -6,6 +6,7 @@ class UserProfileEntity {
   final String gender;
   final DateTime birthDate;
   final String? avatarUrl;
+  final String role;
 
   const UserProfileEntity({
     required this.id,
@@ -15,5 +16,8 @@ class UserProfileEntity {
     required this.gender,
     required this.birthDate,
     this.avatarUrl,
+    this.role = 'user',
   });
+
+  bool get isAdmin => role == 'ADMIN';
 }
