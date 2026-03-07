@@ -5,6 +5,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../shared/widgets/app_logo.dart';
 import '../../../auth/domain/entities/user_profile_entity.dart';
+import '../../../content/presentation/pages/admin_contenido_tab.dart';
 import '../providers/home_providers.dart';
 
 // Página de inicio para el administrador
@@ -49,7 +50,7 @@ class _AdminHomeScreenState extends ConsumerState<AdminHomeScreen> {
       _AdminDashboardTab(onGestionUsuarios: () => setState(() => _currentIndex = 1),
           onGestionContenido: () => setState(() => _currentIndex = 2)),
       const _AdminUsuariosTab(),
-      const _AdminContenidoTab(),
+      const AdminContenidoTab(),
     ];
 
     return Scaffold(
@@ -196,16 +197,3 @@ class _AdminUsuariosTab extends StatelessWidget {
   }
 }
 
-class _AdminContenidoTab extends StatelessWidget {
-  const _AdminContenidoTab();
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Text(
-        'Gestión de Contenido',
-        style: TextStyle(color: AppColors.textPrimary, fontSize: 18),
-      ),
-    );
-  }
-}
