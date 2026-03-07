@@ -1,7 +1,9 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../../core/constants/app_colors.dart';
 import '../../../../emotional_log/domain/entities/emotional_log_entity.dart';
 import '../../../../emotional_log/presentation/pages/create_emotional_log_page.dart';
@@ -185,13 +187,76 @@ class _SearchBar extends StatelessWidget {
 }
 
 // Widget para la tarjeta de un registro emocional
-class _LogCard extends StatelessWidget {
+class _LogCard extends StatefulWidget {
   const _LogCard({required this.log});
   final EmotionalLogEntity log;
 
   @override
+  State<_LogCard> createState() => _LogCardState();
+}
+
+class _LogCardState extends State<_LogCard> {
+  final _player = AudioPlayer();
+  PlayerState _playerState = PlayerState.stopped;
+  Duration _position = Duration.zero;
+  Duration _duration = Duration.zero;
+  bool _loadingAudio = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _player.onPlayerStateChanged.listen((s) {
+      if (mounted) setState(() => _playerState = s);
+    });
+    _player.onPositionChanged.listen((p) {
+      if (mounted) setState(() => _position = p);
+    });
+    _player.onDurationChanged.listen((d) {
+      if (mounted) setState(() => _duration = d);
+    });
+    _player.onPlayerComplete.listen((_) {
+      if (mounted) setState(() => _position = Duration.zero);
+    });
+  }
+
+  @override
+  void dispose() {
+    _player.dispose();
+    super.dispose();
+  }
+
+  Future<void> _togglePlayback() async {
+    if (_playerState == PlayerState.playing) {
+      await _player.pause();
+      return;
+    }
+
+    if (_playerState == PlayerState.paused) {
+      await _player.resume();
+      return;
+    }
+
+    // First play: fetch a signed URL from Supabase Storage
+    setState(() => _loadingAudio = true);
+    try {
+      final signedUrl = await Supabase.instance.client.storage
+          .from('audio_logs')
+          .createSignedUrl(widget.log.audioUrl!, 3600);
+      await _player.play(UrlSource(signedUrl));
+    } catch (_) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('No se pudo reproducir el audio.')),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _loadingAudio = false);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final hasAudio = log.audioUrl != null;
+    final hasAudio = widget.log.audioUrl != null;
 
     return Container(
       width: double.infinity,
@@ -204,33 +269,24 @@ class _LogCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (hasAudio)
-            Container(
-              margin: const EdgeInsets.only(bottom: 12),
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: AppColors.background,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Row(
-                children: [
-                  const Icon(LucideIcons.mic, color: AppColors.primary, size: 20),
-                  const SizedBox(width: 10),
-                  Text(
-                    'Nota de audio',
-                    style: GoogleFonts.inter(
-                      color: AppColors.textSecondary,
-                      fontSize: 13,
-                    ),
-                  ),
-                ],
+          if (hasAudio) ...[
+            _AudioPlayerRow(
+              isPlaying: _playerState == PlayerState.playing,
+              isLoading: _loadingAudio,
+              position: _position,
+              duration: _duration,
+              onToggle: _togglePlayback,
+              onSeek: (value) => _player.seek(
+                Duration(milliseconds: (value * _duration.inMilliseconds).round()),
               ),
             ),
-          if (log.textNote != null && log.textNote!.isNotEmpty)
+            const SizedBox(height: 12),
+          ],
+          if (widget.log.textNote != null && widget.log.textNote!.isNotEmpty)
             Padding(
               padding: const EdgeInsets.only(bottom: 12),
               child: Text(
-                log.textNote!,
+                widget.log.textNote!,
                 style: GoogleFonts.inter(
                   color: AppColors.textPrimary,
                   fontSize: 15,
@@ -252,10 +308,106 @@ class _LogCard extends StatelessWidget {
               ),
               const SizedBox(width: 8),
               Text(
-                _emojiForMood(log.moodIndicator),
+                _emojiForMood(widget.log.moodIndicator),
                 style: const TextStyle(fontSize: 22),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// Widget para la fila de reproducción de audio
+class _AudioPlayerRow extends StatelessWidget {
+  const _AudioPlayerRow({
+    required this.isPlaying,
+    required this.isLoading,
+    required this.position,
+    required this.duration,
+    required this.onToggle,
+    required this.onSeek,
+  });
+
+  final bool isPlaying;
+  final bool isLoading;
+  final Duration position;
+  final Duration duration;
+  final VoidCallback onToggle;
+  final void Function(double value) onSeek;
+
+  String _format(Duration d) {
+    final m = d.inMinutes.remainder(60).toString().padLeft(2, '0');
+    final s = d.inSeconds.remainder(60).toString().padLeft(2, '0');
+    return '$m:$s';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final progress = (duration.inMilliseconds > 0)
+        ? (position.inMilliseconds / duration.inMilliseconds).clamp(0.0, 1.0)
+        : 0.0;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          isLoading
+              ? const SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: AppColors.primary,
+                  ),
+                )
+              : IconButton(
+                  icon: Icon(
+                    isPlaying ? LucideIcons.pause : LucideIcons.play,
+                    color: AppColors.primary,
+                    size: 22,
+                  ),
+                  onPressed: onToggle,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(
+                    minWidth: 36,
+                    minHeight: 36,
+                  ),
+                ),
+          const SizedBox(width: 4),
+          Expanded(
+            child: SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                trackHeight: 3,
+                thumbShape:
+                    const RoundSliderThumbShape(enabledThumbRadius: 6),
+                overlayShape:
+                    const RoundSliderOverlayShape(overlayRadius: 12),
+                activeTrackColor: AppColors.primary,
+                inactiveTrackColor: AppColors.inputBorder,
+                thumbColor: AppColors.primary,
+                overlayColor: AppColors.primary.withAlpha(40),
+              ),
+              child: Slider(
+                value: progress,
+                onChanged: onSeek,
+              ),
+            ),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            duration.inSeconds > 0
+                ? '${_format(position)} / ${_format(duration)}'
+                : '--:--',
+            style: GoogleFonts.inter(
+              color: AppColors.textSecondary,
+              fontSize: 11,
+            ),
           ),
         ],
       ),

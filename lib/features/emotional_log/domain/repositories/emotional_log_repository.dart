@@ -6,5 +6,6 @@ abstract class EmotionalLogRepository {
     required String userId,
     required int moodIndicator,
     String? textNote,
+    String? audioFilePath,
   });
 }

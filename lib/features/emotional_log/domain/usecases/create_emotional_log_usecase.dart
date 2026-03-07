@@ -8,10 +8,12 @@ class CreateEmotionalLogUseCase {
     required String userId,
     required int moodIndicator,
     String? textNote,
+    String? audioFilePath,
   }) =>
       _repository.createLog(
         userId: userId,
         moodIndicator: moodIndicator,
         textNote: textNote,
+        audioFilePath: audioFilePath,
       );
 }

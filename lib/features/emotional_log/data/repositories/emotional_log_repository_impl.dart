@@ -15,10 +15,12 @@ class EmotionalLogRepositoryImpl implements EmotionalLogRepository {
     required String userId,
     required int moodIndicator,
     String? textNote,
+    String? audioFilePath,
   }) =>
       _dataSource.createLog(
         userId: userId,
         moodIndicator: moodIndicator,
         textNote: textNote,
+        audioFilePath: audioFilePath,
       );
 }

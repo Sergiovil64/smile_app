@@ -55,6 +55,7 @@ class CreateLogNotifier extends Notifier<CreateLogState> {
   Future<void> createLog({
     required int moodIndicator,
     String? textNote,
+    String? audioFilePath,
   }) async {
     state = const CreateLogLoading();
     try {
@@ -68,6 +69,7 @@ class CreateLogNotifier extends Notifier<CreateLogState> {
         userId: userId,
         moodIndicator: moodIndicator,
         textNote: textNote,
+        audioFilePath: audioFilePath,
       );
       state = const CreateLogSuccess();
     } catch (e) {

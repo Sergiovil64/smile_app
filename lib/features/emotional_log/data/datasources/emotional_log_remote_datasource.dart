@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/emotional_log_entity.dart';
 
@@ -7,6 +8,7 @@ abstract class EmotionalLogRemoteDataSource {
     required String userId,
     required int moodIndicator,
     String? textNote,
+    String? audioFilePath,
   });
 }
 
@@ -41,11 +43,30 @@ class EmotionalLogRemoteDataSourceImpl implements EmotionalLogRemoteDataSource {
     required String userId,
     required int moodIndicator,
     String? textNote,
+    String? audioFilePath,
   }) async {
+    String? storagePath;
+
+    if (audioFilePath != null) {
+      final file = File(audioFilePath);
+      final ext = audioFilePath.split('.').last.toLowerCase();
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final objectPath = '$userId/$timestamp.$ext';
+
+      await _client.storage.from('audio_logs').upload(
+            objectPath,
+            file,
+            fileOptions: const FileOptions(upsert: false),
+          );
+
+      storagePath = objectPath;
+    }
+
     await _client.from('emotional_log').insert({
       'user_id': userId,
       'mood_indicator': moodIndicator,
       if (textNote != null && textNote.isNotEmpty) 'text_note': textNote,
+      if (storagePath != null) 'audio_url': storagePath,
     });
   }
 }
