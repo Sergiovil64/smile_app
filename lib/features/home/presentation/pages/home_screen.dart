@@ -24,11 +24,11 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
 
-  static const List<Widget> _tabs = [
-    PerfilTab(),
-    HistorialTab(),
-    ActividadesTab(),
-    ContenidoTab(),
+  final List<Widget> _tabs = [
+    const PerfilTab(),
+    const HistorialTab(),
+    const ActividadesTab(),
+    const ContenidoTab(),
   ];
 
   static const List<String> _tabTitles = [

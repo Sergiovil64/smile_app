@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_lucide/flutter_lucide.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -147,10 +148,12 @@ class ContentDetailPage extends StatelessWidget {
             _buildSection(label: 'Cuerpo', text: content.bodyText!),
           ],
 
-          // URL de medio
-          if (content.mediaUrl != null && content.mediaUrl!.isNotEmpty) ...[
+          // Copiar recurso
+          if ((content.type == 'VIDEO' || content.type == 'TEXT' || content.type == 'AUDIO') &&
+              content.mediaUrl != null &&
+              content.mediaUrl!.isNotEmpty) ...[
             const SizedBox(height: 20),
-            _buildSection(label: 'URL de medio', text: content.mediaUrl!),
+            _CopyUrlCard(url: content.mediaUrl!),
           ],
 
           const SizedBox(height: 32),
@@ -231,7 +234,122 @@ class ContentDetailPage extends StatelessWidget {
   }
 }
 
-  // Widget para mostrar la imagen de portada del contenido
+
+class _CopyUrlCard extends StatefulWidget {
+  const _CopyUrlCard({required this.url});
+  final String url;
+
+  @override
+  State<_CopyUrlCard> createState() => _CopyUrlCardState();
+}
+
+// Widget para mostrar la tarjeta de URL de recurso
+class _CopyUrlCardState extends State<_CopyUrlCard> {
+  bool _copied = false;
+
+  Future<void> _copy() async {
+    await Clipboard.setData(ClipboardData(text: widget.url));
+    setState(() => _copied = true);
+    await Future.delayed(const Duration(seconds: 2));
+    if (mounted) setState(() => _copied = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'RECURSO',
+          style: GoogleFonts.inter(
+            color: AppColors.textSecondary,
+            fontSize: 11,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1.1,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+          decoration: BoxDecoration(
+            color: AppColors.surface,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(
+              color: _copied
+                  ? AppColors.primary.withAlpha(180)
+                  : AppColors.inputBorder,
+            ),
+          ),
+          child: Row(
+            children: [
+              Expanded(
+                child: Text(
+                  widget.url,
+                  style: GoogleFonts.inter(
+                    color: AppColors.textSecondary,
+                    fontSize: 12,
+                    height: 1.4,
+                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 12),
+              GestureDetector(
+                onTap: _copy,
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: _copied
+                        ? AppColors.primary
+                        : AppColors.primary.withAlpha(30),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        _copied ? LucideIcons.check : LucideIcons.copy,
+                        size: 14,
+                        color: _copied
+                            ? AppColors.onPrimary
+                            : AppColors.primary,
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        _copied ? 'Copiado' : 'Copiar',
+                        style: GoogleFonts.inter(
+                          color: _copied
+                              ? AppColors.onPrimary
+                              : AppColors.primary,
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'Pega esta URL en tu navegador para abrir o descargar el archivo.',
+          style: GoogleFonts.inter(
+            color: AppColors.textHint,
+            fontSize: 11,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Widget para mostrar la imagen de portada del contenido
+
 class _CoverHero extends StatelessWidget {
   const _CoverHero({required this.coverImageUrl, required this.type});
 
