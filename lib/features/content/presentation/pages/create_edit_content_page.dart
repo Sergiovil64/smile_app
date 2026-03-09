@@ -36,6 +36,7 @@ class _CreateEditContentPageState
 
   bool _isPickingMedia = false;
   bool _isPickingCover = false;
+  bool _isPublished = false;
 
   bool get _isEditing => widget.content != null;
 
@@ -48,6 +49,7 @@ class _CreateEditContentPageState
         TextEditingController(text: c?.description ?? '');
     _bodyController = TextEditingController(text: c?.bodyText ?? '');
     _selectedType = c?.type;
+    _isPublished = c?.isPublished ?? false;
   }
 
   @override
@@ -148,6 +150,7 @@ class _CreateEditContentPageState
               : _bodyController.text.trim(),
           mediaFilePath: _mediaFilePath,
           coverImagePath: _coverImagePath,
+          isPublished: _isPublished,
         );
   }
 
@@ -299,10 +302,10 @@ class _CreateEditContentPageState
 
           // Botón de publicación
           _PublishToggle(
-            value: _isEditing
-                ? (widget.content?.isPublished ?? false)
-                : false,
-            onChanged: isLoading ? null : (_) {},
+            value: _isPublished,
+            onChanged: isLoading
+                ? null
+                : (v) => setState(() => _isPublished = v),
           ),
           const SizedBox(height: 40),
 
