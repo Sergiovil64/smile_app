@@ -1,5 +1,9 @@
 import '../repositories/content_repository.dart';
 
+/// Caso de uso para crear o actualizar contenido educativo.
+///
+/// Si [id] es null, crea uno nuevo. Los archivos en [mediaFilePath] y
+/// [coverImagePath] se suben a Supabase Storage.
 class SaveContentUseCase {
   final ContentRepository _repository;
   const SaveContentUseCase(this._repository);

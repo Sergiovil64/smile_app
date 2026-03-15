@@ -2,8 +2,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../auth/domain/entities/user_profile_entity.dart';
 import '../../../auth/presentation/providers/auth_providers.dart';
-import 'dart:developer';
 
+/// Provider que obtiene el perfil del usuario actual desde user_profile.
+///
+/// Depende de [supabaseSessionProvider] para recalcularse en login/logout.
+/// Retorna null si no hay sesión o si el usuario no tiene perfil.
 final currentUserProfileProvider = FutureProvider<UserProfileEntity?>((ref) async {
   // Dependencia al stream de sesión para que el provider se recalcule
   // automáticamente en cada cambio de autenticación (login, logout, refresh).

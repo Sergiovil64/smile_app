@@ -6,7 +6,10 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'core/theme/app_theme.dart';
 import 'core/widgets/auth_gate.dart';
 
-// Punto de entrada de la aplicación
+/// Punto de entrada de la aplicación Smile.
+///
+/// Inicializa Flutter, carga variables de entorno (.env), configura Supabase
+/// y arranca la app con [ProviderScope] para Riverpod.
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Cargar variables de entorno
@@ -26,11 +29,11 @@ Future<void> main() async {
   );
 }
 
-// Aplicación principal
+/// Widget raíz de la aplicación. Configura MaterialApp con tema oscuro,
+/// localización (es/en) y [AuthGate] como pantalla inicial.
 class SmileApp extends StatelessWidget {
   const SmileApp({super.key});
 
-  // Construir la aplicación
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

@@ -2,7 +2,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/activity_entity.dart';
 
-/// Obtiene todas las actividades activas de self_care_activity.
+/// Obtiene todas las actividades de autocuidado activas.
+///
+/// Consulta la tabla self_care_activity con is_active=true,
+/// ordenadas por fecha de creación descendente.
 final activitiesProvider = FutureProvider<List<ActivityEntity>>((ref) async {
   final data = await Supabase.instance.client
       .from('self_care_activity')

@@ -1,33 +1,33 @@
 import '../../domain/entities/user_entity.dart';
 
-// Estado de la autenticación
+/// Estados posibles del flujo de login manejados por [AuthNotifier].
 sealed class LoginState {
   const LoginState();
 }
 
-// Estado inicial de la autenticación
+/// Estado inicial antes de intentar login.
 class LoginInitial extends LoginState {
   const LoginInitial();
 }
 
-// Estado de carga de la autenticación
+/// Estado de carga mientras se autentica.
 class LoginLoading extends LoginState {
   const LoginLoading();
 }
 
-// Estado de éxito de la autenticación
+/// Login exitoso con perfil completo. Redirige a home.
 class LoginSuccess extends LoginState {
   final UserEntity user;
   const LoginSuccess(this.user);
 }
 
-// Estado de perfil incompleto de la autenticación
+/// Login exitoso pero sin perfil. Redirige a completar registro.
 class LoginProfileIncomplete extends LoginState {
   final UserEntity user;
   const LoginProfileIncomplete(this.user);
 }
 
-// Estado de error de la autenticación
+/// Error en el login. [message] es el mensaje mostrado al usuario.
 class LoginError extends LoginState {
   final String message;
   const LoginError(this.message);

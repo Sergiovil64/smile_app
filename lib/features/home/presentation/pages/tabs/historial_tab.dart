@@ -33,6 +33,10 @@ Map<DateTime, List<EmotionalLogEntity>> _groupByDate(
   return map;
 }
 
+/// Tab que muestra el historial de registros emocionales del usuario.
+///
+/// Incluye barra de búsqueda, agrupación por fecha, reproducción de audios
+/// y FAB para crear nuevo registro. Usa [emotionalLogsProvider].
 class HistorialTab extends ConsumerStatefulWidget {
   const HistorialTab({super.key});
 
@@ -146,7 +150,7 @@ class _HistorialTabState extends ConsumerState<HistorialTab> {
   }
 }
 
-// Widget para el campo de busqueda de los registros emocionales
+/// Campo de búsqueda para filtrar registros por texto de la nota.
 class _SearchBar extends StatelessWidget {
   const _SearchBar({required this.controller});
   final TextEditingController controller;
@@ -186,7 +190,7 @@ class _SearchBar extends StatelessWidget {
   }
 }
 
-// Widget para la tarjeta de un registro emocional
+/// Tarjeta que muestra un registro emocional: nota, emoji de ánimo y reproductor de audio.
 class _LogCard extends StatefulWidget {
   const _LogCard({required this.log});
   final EmotionalLogEntity log;
@@ -319,7 +323,7 @@ class _LogCardState extends State<_LogCard> {
   }
 }
 
-// Widget para la fila de reproducción de audio
+/// Fila con botón play/pause, slider de progreso y tiempo para reproducir audios.
 class _AudioPlayerRow extends StatelessWidget {
   const _AudioPlayerRow({
     required this.isPlaying,
@@ -415,7 +419,7 @@ class _AudioPlayerRow extends StatelessWidget {
   }
 }
 
-// Widget para el estado de no hay registros
+/// Estado vacío: mensaje distinto si hay búsqueda activa o no hay registros.
 class _EmptyState extends StatelessWidget {
   const _EmptyState({required this.hasQuery});
   final bool hasQuery;

@@ -55,6 +55,8 @@ class AuthGate extends ConsumerWidget {
   }
 }
 
+/// Decide si mostrar [AdminHomeScreen] o [HomeScreen] según el rol del perfil.
+/// Si el perfil tiene role 'ADMIN', redirige a admin; si no, a la home de adolescentes.
 class _RoleGate extends ConsumerWidget {
   const _RoleGate();
 
@@ -76,6 +78,7 @@ class _RoleGate extends ConsumerWidget {
   }
 }
 
+/// Pantalla de carga mostrada mientras se restaura la sesión o se obtiene el perfil.
 class _SplashScreen extends StatelessWidget {
   const _SplashScreen();
 

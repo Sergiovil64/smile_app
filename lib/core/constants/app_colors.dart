@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
-// Temas de colores para la aplicación
+/// Paleta de colores de la aplicación (tema oscuro).
+///
+/// Define colores para fondo, superficies, primario, texto y estados.
 abstract class AppColors {
   static const Color background = Color(0xFF0D0D0D);
   static const Color surface = Color(0xFF1C1C1E);

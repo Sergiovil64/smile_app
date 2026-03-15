@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/emotional_log_entity.dart';
 
+/// Contrato del datasource de registros emocionales. Accede a emotional_log y Storage.
 abstract class EmotionalLogRemoteDataSource {
   Future<List<EmotionalLogEntity>> getLogs(String userId);
   Future<void> createLog({
@@ -12,11 +13,11 @@ abstract class EmotionalLogRemoteDataSource {
   });
 }
 
+/// Implementación que usa PostgREST y Storage. Los audios se suben al bucket audio_logs.
 class EmotionalLogRemoteDataSourceImpl implements EmotionalLogRemoteDataSource {
   final SupabaseClient _client;
   const EmotionalLogRemoteDataSourceImpl(this._client);
 
-  // Obtener los registros emocionales del usuario
   @override
   Future<List<EmotionalLogEntity>> getLogs(String userId) async {
     final data = await _client

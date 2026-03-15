@@ -2,6 +2,8 @@ import '../../domain/entities/content_entity.dart';
 import '../../domain/repositories/content_repository.dart';
 import '../datasources/content_remote_datasource.dart';
 
+/// Implementación de [ContentRepository] que delega en [ContentRemoteDataSource].
+/// Los archivos multimedia se suben a Supabase Storage vía el datasource.
 class ContentRepositoryImpl implements ContentRepository {
   final ContentRemoteDataSource _dataSource;
   const ContentRepositoryImpl(this._dataSource);

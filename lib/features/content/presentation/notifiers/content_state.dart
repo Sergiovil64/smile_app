@@ -1,3 +1,4 @@
+/// Estados del guardado de contenido manejados por [SaveContentNotifier].
 sealed class SaveContentState {
   const SaveContentState();
 }

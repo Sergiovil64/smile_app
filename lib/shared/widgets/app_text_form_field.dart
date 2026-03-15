@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_colors.dart';
 
-// Widget para el campo de texto de la aplicación
-// Este widget se encarga de mostrar un campo de texto con un label, un icono y un color de fondo
-
+/// Campo de texto reutilizable con label, validación y soporte para contraseña.
+/// Usado en formularios de login, registro y recuperación.
 class AppTextFormField extends StatelessWidget {
   const AppTextFormField({
     super.key,

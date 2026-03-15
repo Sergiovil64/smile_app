@@ -1,5 +1,9 @@
 import '../repositories/emotional_log_repository.dart';
 
+/// Caso de uso para crear un registro emocional.
+///
+/// Captura moodIndicator, nota opcional y/o audio. El audio en [audioFilePath]
+/// se sube a Supabase Storage.
 class CreateEmotionalLogUseCase {
   final EmotionalLogRepository _repository;
   const CreateEmotionalLogUseCase(this._repository);

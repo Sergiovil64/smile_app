@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../../core/constants/app_colors.dart';
 import '../../providers/home_providers.dart';
 
+/// Tab de perfil que muestra un mensaje de bienvenida con el nombre del usuario.
+/// Usa [currentUserProfileProvider] para obtener el perfil.
 class PerfilTab extends ConsumerWidget {
   const PerfilTab({super.key});
 

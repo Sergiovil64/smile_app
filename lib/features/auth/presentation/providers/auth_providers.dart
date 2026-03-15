@@ -11,10 +11,12 @@ import '../notifiers/auth_state.dart';
 import '../notifiers/forgot_password_state.dart';
 import '../notifiers/reset_password_state.dart';
 
+/// Cliente de Supabase inyectado para datasources y repositorios.
 final _supabaseClientProvider = Provider<SupabaseClient>(
   (_) => Supabase.instance.client,
 );
 
+/// Datasource de autenticación (Supabase Auth).
 final _authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>(
   (ref) => AuthRemoteDataSourceImpl(ref.watch(_supabaseClientProvider)),
 );
@@ -40,7 +42,8 @@ final _signInUseCaseProvider = Provider<SignInUseCase>(
 
 // ── Notifier ─────────────────────────────────────────────────────────────────
 
-// Método que se encarga de notificar el estado de la autenticación
+/// Notificador que gestiona el estado del login (loading, success, error).
+/// Usa [SignInUseCase] para autenticar y determinar si el usuario tiene perfil.
 class AuthNotifier extends Notifier<LoginState> {
   @override
   LoginState build() => const LoginInitial();
@@ -94,6 +97,8 @@ final supabaseSessionProvider = StreamProvider<AuthState>(
 );
 
 
+/// Notificador para el flujo de "olvidé mi contraseña".
+/// Envía el correo de recuperación vía [AuthRepository.resetPassword].
 class ForgotPasswordNotifier extends Notifier<ForgotPasswordState> {
   @override
   ForgotPasswordState build() => const ForgotPasswordInitial();
@@ -127,6 +132,8 @@ final forgotPasswordNotifierProvider =
   ForgotPasswordNotifier.new,
 );
 
+/// Notificador para el flujo de cambio de contraseña (tras link de recuperación).
+/// Actualiza la contraseña con [AuthRepository.updatePassword].
 class ResetPasswordNotifier extends Notifier<ResetPasswordState> {
   @override
   ResetPasswordState build() => const ResetPasswordInitial();

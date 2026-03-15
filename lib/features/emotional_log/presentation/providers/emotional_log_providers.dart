@@ -9,10 +9,12 @@ import '../../domain/usecases/create_emotional_log_usecase.dart';
 import '../../domain/usecases/get_emotional_logs_usecase.dart';
 import '../notifiers/emotional_log_state.dart';
 
+/// Cliente de Supabase para el datasource de registros emocionales.
 final _supabaseClientProvider = Provider<SupabaseClient>(
   (_) => Supabase.instance.client,
 );
 
+/// Datasource que accede a emotional_log y Storage (audios).
 final _emotionalLogDataSourceProvider =
     Provider<EmotionalLogRemoteDataSource>((ref) {
   return EmotionalLogRemoteDataSourceImpl(ref.read(_supabaseClientProvider));
@@ -35,7 +37,10 @@ final _createEmotionalLogUseCaseProvider =
   return CreateEmotionalLogUseCase(ref.read(_emotionalLogRepositoryProvider));
 });
 
-/// Obtiene todos los registros emocionales del usuario actual, se ejecuta nuevamente al cambiar la autenticación.
+/// Obtiene los registros emocionales del usuario actual.
+///
+/// Depende de [supabaseSessionProvider] para recalcularse en login/logout.
+/// Retorna lista vacía si no hay sesión.
 final emotionalLogsProvider =
     FutureProvider<List<EmotionalLogEntity>>((ref) async {
   ref.watch(supabaseSessionProvider);
@@ -47,7 +52,9 @@ final emotionalLogsProvider =
   return ref.read(_getEmotionalLogsUseCaseProvider)(userId);
 });
 
-/// Notificador que maneja el envío del formulario de creación de un registro emocional.
+/// Notificador que maneja la creación de registros emocionales.
+///
+/// Usa [CreateEmotionalLogUseCase] para guardar moodIndicator, nota y/o audio.
 class CreateLogNotifier extends Notifier<CreateLogState> {
   @override
   CreateLogState build() => const CreateLogInitial();

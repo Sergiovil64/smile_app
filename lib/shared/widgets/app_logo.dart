@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-// Widget para la logo de la aplicación
-
+/// Logo de la aplicación Smile. Muestra la imagen desde assets.
 class AppLogo extends StatelessWidget {
   const AppLogo({
     super.key,

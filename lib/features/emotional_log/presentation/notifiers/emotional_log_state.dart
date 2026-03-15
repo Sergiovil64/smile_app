@@ -1,4 +1,4 @@
-// Estado de creación de un registro emocional
+/// Estados de creación de registro emocional manejados por [CreateLogNotifier].
 sealed class CreateLogState {
   const CreateLogState();
 }

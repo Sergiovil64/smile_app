@@ -7,6 +7,10 @@ import '../../../../content/domain/entities/content_entity.dart';
 import '../../../../content/presentation/pages/content_detail_page.dart';
 import '../../../../content/presentation/providers/content_providers.dart';
 
+/// Tab que muestra la lista de contenidos educativos publicados.
+///
+/// Usa [contentsProvider] para cargar los datos. Soporta pull-to-refresh.
+/// Cada item navega a [ContentDetailPage] al tocarlo.
 class ContenidoTab extends ConsumerWidget {
   const ContenidoTab({super.key});
 
@@ -14,47 +18,74 @@ class ContenidoTab extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final contentsAsync = ref.watch(contentsProvider);
 
+    Future<void> refresh() async => ref.invalidate(contentsProvider);
+
     return contentsAsync.when(
-      data: (contents) => contents.isEmpty
-          ? Center(
-              child: Text(
-                'No hay contenido disponible aún.',
-                textAlign: TextAlign.center,
-                style: GoogleFonts.inter(
-                  color: AppColors.textSecondary,
-                  fontSize: 15,
-                ),
-              ),
-            )
-          : ListView.separated(
-              padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
-              itemCount: contents.length,
-              separatorBuilder: (_, __) => const SizedBox(height: 12),
-              itemBuilder: (context, index) => _UserContentCard(
-                content: contents[index],
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (_) =>
-                        ContentDetailPage(content: contents[index]),
+      data: (contents) => RefreshIndicator(
+        color: AppColors.primary,
+        onRefresh: refresh,
+        child: contents.isEmpty
+            ? ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                children: [
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.6,
+                    child: Center(
+                      child: Text(
+                        'No hay contenido disponible aún.',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.inter(
+                          color: AppColors.textSecondary,
+                          fontSize: 15,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              )
+            : ListView.separated(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 24),
+                itemCount: contents.length,
+                separatorBuilder: (_, __) => const SizedBox(height: 12),
+                itemBuilder: (context, index) => _UserContentCard(
+                  content: contents[index],
+                  onTap: () => Navigator.of(context).push(
+                    MaterialPageRoute(
+                      builder: (_) =>
+                          ContentDetailPage(content: contents[index]),
+                    ),
                   ),
                 ),
               ),
-            ),
+      ),
       loading: () => const Center(
         child: CircularProgressIndicator(color: AppColors.primary),
       ),
-      error: (_, __) => Center(
-        child: Text(
-          'Error al cargar el contenido.',
-          style: GoogleFonts.inter(color: AppColors.textSecondary),
+      error: (_, __) => RefreshIndicator(
+        color: AppColors.primary,
+        onRefresh: refresh,
+        child: ListView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          children: [
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.6,
+              child: Center(
+                child: Text(
+                  'Error al cargar el contenido.',
+                  style: GoogleFonts.inter(color: AppColors.textSecondary),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
 
-// Widget para mostrar la tarjeta de contenido
-
+/// Tarjeta que muestra título, descripción, tipo y miniatura de un contenido.
+/// Al tocarla navega al detalle del contenido.
 class _UserContentCard extends StatelessWidget {
   const _UserContentCard({required this.content, required this.onTap});
 
@@ -142,8 +173,7 @@ class _UserContentCard extends StatelessWidget {
   }
 }
 
-// Widget para mostrar el badge del tipo de contenido
-
+/// Badge que muestra el tipo de contenido (Texto, Audio, Video) con icono.
 class _TypeBadge extends StatelessWidget {
   const _TypeBadge({required this.type});
   final String type;
@@ -190,8 +220,7 @@ class _TypeBadge extends StatelessWidget {
   }
 }
 
-// Widget para mostrar la miniatura del contenido
-
+/// Miniatura del contenido: imagen de portada o icono según tipo si no hay imagen.
 class _Thumbnail extends StatelessWidget {
   const _Thumbnail({required this.coverImageUrl, required this.type});
 

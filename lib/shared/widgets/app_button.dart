@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/constants/app_colors.dart';
 
-// Widget para el botón de la aplicación
-// Este widget se encarga de mostrar un botón con un label, un icono y un color de fondo
+/// Botón reutilizable con label, icono opcional y estado de carga.
+/// Usado en login, registro y formularios.
 class AppButton extends StatelessWidget {
   const AppButton({
     super.key,

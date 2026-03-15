@@ -5,15 +5,18 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../shared/widgets/app_logo.dart';
 import '../../../auth/domain/entities/user_profile_entity.dart';
+import '../../../content/presentation/providers/content_providers.dart';
 import '../providers/home_providers.dart';
 import 'tabs/perfil_tab.dart';
 import 'tabs/historial_tab.dart';
 import 'tabs/actividades_tab.dart';
 import 'tabs/contenido_tab.dart';
 
-// Página de inicio
-// Este archivo implementa los estilos y la lógica de la página de inicio
-// Una vez que se ha iniciado sesión por parte del adolescente, se muestra esta página
+/// Pantalla principal para usuarios adolescentes tras iniciar sesión.
+///
+/// Muestra una barra de navegación inferior con 4 tabs: Perfil, Historial,
+/// Actividades y Contenido. El título del AppBar cambia según el tab activo.
+/// Al cambiar a Contenido se invalida [contentsProvider] para refrescar datos.
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
@@ -44,7 +47,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     fontSize: 18,
   );
 
-// Función para construir el título de la página dinamicamente
+  /// Construye el título del AppBar: saludo con nombre en Perfil, nombre del tab en el resto.
   Widget _buildTitle(AsyncValue<UserProfileEntity?> profileAsync) {
     if (_currentIndex == 0) {
       return profileAsync.maybeWhen(
@@ -99,7 +102,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         unselectedItemColor: AppColors.textSecondary,
         type: BottomNavigationBarType.fixed,
         currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+        onTap: (index) {
+          if (index == 3) ref.invalidate(contentsProvider);
+          setState(() => _currentIndex = index);
+        },
         items: const [
           BottomNavigationBarItem(
             icon: Icon(LucideIcons.user),

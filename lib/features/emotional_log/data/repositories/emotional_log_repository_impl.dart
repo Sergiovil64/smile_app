@@ -2,6 +2,8 @@ import '../../domain/entities/emotional_log_entity.dart';
 import '../../domain/repositories/emotional_log_repository.dart';
 import '../datasources/emotional_log_remote_datasource.dart';
 
+/// Implementación de [EmotionalLogRepository] que delega en [EmotionalLogRemoteDataSource].
+/// Los audios se suben al bucket audio_logs en Supabase Storage.
 class EmotionalLogRepositoryImpl implements EmotionalLogRepository {
   final EmotionalLogRemoteDataSource _dataSource;
   const EmotionalLogRepositoryImpl(this._dataSource);

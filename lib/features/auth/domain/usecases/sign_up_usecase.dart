@@ -1,13 +1,16 @@
 import '../entities/user_entity.dart';
 import '../repositories/auth_repository.dart';
 
-// Usecase para crear una cuenta
+/// Caso de uso para crear una cuenta (solo Auth, sin perfil).
+///
+/// Usado cuando el usuario ya tiene cuenta y solo necesita autenticarse.
+/// Para registro completo con perfil, usar [RegisterUserUseCase].
 class SignUpUseCase {
   final AuthRepository _repository;
 
   const SignUpUseCase(this._repository);
 
-  // Método para crear una cuenta
+  /// Crea el usuario en Supabase Auth. No crea perfil en user_profile.
   Future<UserEntity> call({
     required String email,
     required String password,

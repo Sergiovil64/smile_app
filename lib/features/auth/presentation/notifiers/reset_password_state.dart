@@ -1,3 +1,4 @@
+/// Estados del flujo de cambio de contraseña manejados por [ResetPasswordNotifier].
 sealed class ResetPasswordState {
   const ResetPasswordState();
 }

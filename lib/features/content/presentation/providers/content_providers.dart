@@ -8,10 +8,12 @@ import '../../domain/usecases/get_contents_usecase.dart';
 import '../../domain/usecases/save_content_usecase.dart';
 import '../notifiers/content_state.dart';
 
+/// Cliente de Supabase para el datasource de contenido.
 final _supabaseClientProvider = Provider<SupabaseClient>(
   (_) => Supabase.instance.client,
 );
 
+/// Datasource que accede a educational_content y Storage.
 final _contentDataSourceProvider = Provider<ContentRemoteDataSource>((ref) {
   return ContentRemoteDataSourceImpl(ref.read(_supabaseClientProvider));
 });

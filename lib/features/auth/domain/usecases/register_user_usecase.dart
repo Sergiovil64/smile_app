@@ -3,7 +3,10 @@ import '../exceptions/auth_exceptions.dart';
 import '../repositories/auth_repository.dart';
 import '../repositories/profile_repository.dart';
 
-// Usecase para registrar un nuevo usuario
+/// Caso de uso para registro completo: crear usuario en Auth y perfil en user_profile.
+///
+/// Si la creación del perfil falla, cierra la sesión y lanza [ProfileCreationException]
+/// para que el usuario pueda reintentar con el mismo correo.
 class RegisterUserUseCase {
   final AuthRepository _authRepository;
   final ProfileRepository _profileRepository;

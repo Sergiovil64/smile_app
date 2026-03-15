@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/content_entity.dart';
 
+/// Contrato del datasource de contenido. Accede a educational_content y Storage.
 abstract class ContentRemoteDataSource {
   Future<List<ContentEntity>> getContents();
   Future<void> saveContent({
@@ -16,11 +17,12 @@ abstract class ContentRemoteDataSource {
   });
 }
 
+/// Implementación que usa PostgREST y Storage de Supabase.
+/// Sube media y covers al bucket content_media.
 class ContentRemoteDataSourceImpl implements ContentRemoteDataSource {
   final SupabaseClient _client;
   const ContentRemoteDataSourceImpl(this._client);
 
-  // Obtener todos los contenidos educativos
   @override
   Future<List<ContentEntity>> getContents() async {
     final data = await _client
@@ -45,7 +47,6 @@ class ContentRemoteDataSourceImpl implements ContentRemoteDataSource {
         .toList();
   }
 
-  // Guardar un contenido educativo
   @override
   Future<void> saveContent({
     String? id,

@@ -1,3 +1,4 @@
+/// Estados del flujo "olvidé mi contraseña" manejados por [ForgotPasswordNotifier].
 sealed class ForgotPasswordState {
   const ForgotPasswordState();
 }

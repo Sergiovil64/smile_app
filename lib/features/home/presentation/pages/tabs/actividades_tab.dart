@@ -6,6 +6,10 @@ import '../../../../../core/constants/app_colors.dart';
 import '../../../../activities/domain/activity_entity.dart';
 import '../../../../activities/presentation/providers/activities_provider.dart';
 
+/// Tab que muestra la lista de actividades de autocuidado.
+///
+/// Incluye búsqueda por título, descripción o categoría.
+/// Usa [activitiesProvider] para cargar los datos.
 class ActividadesTab extends ConsumerStatefulWidget {
   const ActividadesTab({super.key});
 
@@ -133,8 +137,7 @@ class _ActividadesTabState extends ConsumerState<ActividadesTab> {
   }
 }
 
-// Widget para mostrar la tarjeta de actividad
-
+/// Tarjeta que muestra título, descripción, categoría y fecha de una actividad.
 class _ActivityCard extends StatelessWidget {
   const _ActivityCard({required this.activity});
   final ActivityEntity activity;

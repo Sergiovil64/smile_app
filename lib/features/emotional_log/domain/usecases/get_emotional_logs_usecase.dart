@@ -1,6 +1,7 @@
 import '../entities/emotional_log_entity.dart';
 import '../repositories/emotional_log_repository.dart';
 
+/// Caso de uso para obtener los registros emocionales de un usuario.
 class GetEmotionalLogsUseCase {
   final EmotionalLogRepository _repository;
   const GetEmotionalLogsUseCase(this._repository);
